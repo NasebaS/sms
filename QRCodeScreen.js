@@ -66,6 +66,7 @@ const QRCodeScreen = () => {
   );
 };
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -73,24 +74,25 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   cameraContainer: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    borderWidth: 1,
-    borderColor: 'white',
-  },
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        borderWidth: 1,
+        borderColor: 'white',
+      },
   camera: {
     flex: 1,
+    width: '100%',
   },
   detailsContainer: {
     position: 'absolute',
-    bottom: 0,
-    left: 0,
+    top:420,
+       left: 0,
     right: 0,
     backgroundColor: 'white',
-    padding: 10,
+    padding: 20,
   },
   detailsText: {
     color: 'black',
