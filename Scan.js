@@ -12,6 +12,7 @@ import {
 import img from './android/app/src/main/res/drawable/launch_screen.png';
 import QRCodeScreen from './QRCodeScreen';
 import { useNavigation } from '@react-navigation/native';
+import ScanNow from './ScanNow'
 
 
 
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#2196F3',
     paddingVertical: 10,
     paddingHorizontal: 20,
-    borderRadius: 5,
+    borderRadius: 20,
   },
   buttonText: {
     color: 'white',

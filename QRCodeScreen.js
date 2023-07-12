@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import QRCodeScanner from 'react-native-qrcode-scanner';
+import { useNavigation } from '@react-navigation/native';
 
 const QRCodeScreen = () => {
   const [scanning, setScanning] = useState(false);
@@ -12,7 +13,7 @@ const QRCodeScreen = () => {
     wholesalePrice: 'Rs. 52000',
     retailPrice: 'Rs. 52000',
   };
-
+  const navigation = useNavigation();
   useEffect(() => {
     startScanning();
   }, []);
@@ -21,26 +22,41 @@ const QRCodeScreen = () => {
     setScanning(true);
   };
 
-  const handleBarCodeRead = async (event) => {
+  // const handleBarCodeRead = async (event) => {
+  //   if (!scanning) {
+  //     return;
+  //   }
+  //   setScanning(false);
+
+  //   // Access the scanned data from event.data
+  //   const scannedData = event.data;
+  //   Alert.alert(scannedData)
+  //   setBarcodeData(scannedData);
+   
+  //   // Fetch the details from the URL
+  //   // try {
+  //   //   const response = await fetch(scannedData);
+  //   //   const data = await response.json();
+  //   //   setDetails(data);
+     
+  //   // } catch (error) {
+  //   //   Alert.alert('Error', 'Invalid BarCode');
+  //   // }
+  // };
+const handleBarCodeRead = (event) => {
     if (!scanning) {
       return;
     }
-    setScanning(false);
 
     // Access the scanned data from event.data
     const scannedData = event.data;
-    setBarcodeData(scannedData);
 
-    // Fetch the details from the URL
-    try {
-      const response = await fetch(scannedData);
-      const data = await response.json();
-      setDetails(data);
-    } catch (error) {
-      Alert.alert('Error', 'Invalid BarCode');
-    }
+    // Show an alert with the scanned data
+    Alert.alert('Scanned QR Code', scannedData);
+
+    // Resume scanning
+    setScanning(true);
   };
-
   return (
     <View style={styles.container}>
       <QRCodeScanner
@@ -53,15 +69,37 @@ const QRCodeScreen = () => {
       />
       {details && (
         <View style={styles.detailsContainer}>
-          <Text style={styles.detailsText}>Product Name: {details.productName}</Text>
-          <Text style={styles.detailsText}>SMS Code: {details.smsCode}</Text>
-          <Text style={styles.detailsText}>Retail Price: {details.retailPrice}</Text>
-          <Text style={styles.detailsText}>Wholesale Price: {details.wholesalePrice}</Text>
+          <Text style={styles.detailsText}>
+            <Text style={styles.productNameText}>Product Name: </Text>
+  {details.productName}
+</Text>
+<Text style={styles.detailsText}>
+<Text style={styles.smsCodeText}>
+  SMS Code: </Text>
+  {details.smsCode}
+</Text>
+<Text style={styles.detailsText}>
+  <Text style={styles.retailPriceText}>
+  Retail Price: 
+  </Text>
+  <Text style={styles.boldText}>{details.retailPrice}</Text>
+</Text>
+<Text style={styles.detailsText}>
+  <Text style={styles.wholesalePriceText}>
+  Wholesale Price: 
+  </Text>
+  <Text style={styles.boldText}>{details.wholesalePrice}</Text>
+</Text>
+
         </View>
       )}
-      <TouchableOpacity style={styles.button} onPress={startScanning}>
-        <Text style={styles.buttonText}>Start Scanning</Text>
+      <View style={styles.bottomView}>
+      
+      <TouchableOpacity style={styles.backButton} onPress={()=>navigation.navigate('Scan')}>
+        <Text style={styles.backButtonText}>Go Back</Text>
       </TouchableOpacity>
+      </View>
+      
     </View>
   );
 };
@@ -97,17 +135,54 @@ const styles = StyleSheet.create({
   detailsText: {
     color: 'black',
     fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 10,
   },
+  productNameText: {
+    color: '#5A96E3',
+  },
+  smsCodeText: {
+    color: '#5A96E3',
+  },
+  retailPriceText: {
+    color: '#5A96E3',
+  },
+  wholesalePriceText: {
+    color: '#5A96E3',
+  },
+
   button: {
     backgroundColor: '#2196F3',
     paddingVertical: 10,
     paddingHorizontal: 20,
     borderRadius: 5,
     marginTop: 20,
+    marginBottom:30,
   },
   buttonText: {
     color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  boldText:{
+fontWeight:'bold'
+  },
+  bottomView:{
+    flexDirection:'row',
+    justifyContent: 'space-between',
+    marginRight: 20,
+    
+  },
+  backButton:{
+    backgroundColor: '#A8A196',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginTop: 20,
+    marginBottom:30,
+    marginLeft:25,
+  },
+  backButtonText: {
+    color: 'black',
     fontWeight: 'bold',
     fontSize: 16,
   },
