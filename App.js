@@ -11,7 +11,12 @@ const App = () => {
   
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+      <Stack.Navigator initialRouteName="Scan"
+      screenOptions={{
+        headerMode: 'screen',
+        headerTintColor: 'white',
+        headerStyle: { backgroundColor: '#DE006F' },
+      }}>
         <Stack.Screen name="Scan" component={Scan} />
         <Stack.Screen name="QRCodeScreen" component={QRCodeScreen} />
       </Stack.Navigator>
