@@ -1,23 +1,19 @@
 
 
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity,Animated , TouchableHighlight, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity,Animated,Modal , TouchableHighlight, Alert } from 'react-native';
 import { RNCamera } from 'react-native-camera';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
 const QRCodeScreen = () => {
   const [scanning, setScanning] = useState(false);
-  const [barcodeData, setBarcodeData] = useState(null);
-  const details = {
-    productName: 'SMS D/W FANCY CHTRN BUTTA CATALOGUE DESIGN',
-    smsCode: 'SMSMXDG23',
-    wholesalePrice: 'Rs. 52000',
-    retailPrice: 'Rs. 52000',
-  };
+  const [details, setDetails] = useState({});
   const navigation = useNavigation();
   const [buttonScale] = useState(new Animated.Value(1));
+  const [showModal, setShowModal] = useState(false);
 
+ 
   useEffect(() => {
     startScanning();
   }, []);
@@ -26,22 +22,35 @@ const QRCodeScreen = () => {
     setScanning(true);
   };
 
-  const handleBarCodeRead = (event) => {
+  const handleBarCodeRead =async (event) => {
     if (!scanning) {
       return;
     }
-    const scannedData = event.data;
-    Alert.alert('Scanned QR Code', scannedData, [
-      {
-        text: 'OK',
-        onPress: () => {
-          setTimeout(() => {
-            setScanning(true);
-          }, 2000);
-        },
-      },
-    ]);
     setScanning(false);
+    const scannedData = event.data;
+    try {
+      const response = await fetch(
+        `http://192.168.29.38/sms/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`
+      );
+      const data = await response.json();
+      if (data && data.Details && data.Details.length > 0) {
+        setDetails(data.Details[0]);
+      } else {
+        setDetails(null); 
+      }
+      // console.log(data.Details[0]);
+      // console.log(details.ProductName)
+      // console.log(details.SMSCode)
+      // console.log(details.RetailPrice)
+      // console.log(details.WholeSalePrice)
+    
+    } catch (error) {
+      console.error('Error fetching details:', error);
+      setDetails(null); 
+    }
+
+    setShowModal(true);
+    
   };
   const goBack = () => {
     navigation.navigate('Scan');
@@ -62,14 +71,11 @@ const QRCodeScreen = () => {
       goBack();
     });
   };
-  // function marker(color: string, size: string | number, borderLength: string | number, thickness: number = 2, borderRadius: number = 0): JSX.Element {
-  //   return <View style={{ height: size, width: size }}>
-  //     <View style={{ position: 'absolute', height: borderLength, width: borderLength, top: 0, left: 0, borderColor: color, borderTopWidth: thickness, borderLeftWidth: thickness, borderTopLeftRadius: borderRadius }}></View>
-  //     <View style={{ position: 'absolute', height: borderLength, width: borderLength, top: 0, right: 0, borderColor: color, borderTopWidth: thickness, borderRightWidth: thickness, borderTopRightRadius: borderRadius }}></View>
-  //     <View style={{ position: 'absolute', height: borderLength, width: borderLength, bottom: 0, left: 0, borderColor: color, borderBottomWidth: thickness, borderLeftWidth: thickness, borderBottomLeftRadius: borderRadius }}></View>
-  //     <View style={{ position: 'absolute', height: borderLength, width: borderLength, bottom: 0, right: 0, borderColor: color, borderBottomWidth: thickness, borderRightWidth: thickness, borderBottomRightRadius: borderRadius }}></View>
-  //   </View>
-  // }
+  const closeModal = () => {
+    setShowModal(false);
+    setScanning(true); // Start scanning again after closing the modal
+  };
+  
   return (
     <View style={styles.container}>
       <QRCodeScanner
@@ -80,36 +86,32 @@ const QRCodeScreen = () => {
         cameraContainerStyle={styles.cameraContainer}
         cameraStyle={styles.camera}
         vibrate={false}
-        // customMarker={marker('white', '60%', '25%', 6, 20)}
+        
       />
-      {details && (
-        <View style={styles.detailsContainer}>
-          <Text style={styles.cardTitle}>Product Details:</Text>
-          <View style={styles.card}>
-            <View style={styles.wrapper}>
-            
-            <Text style={styles.cardText}>
-              Product Name: <Text style={styles.boldText}>{details.productName}</Text>
-            </Text>
-             </View>
-             <View style={styles.wrapper}>
-            <Text style={styles.cardText}>
-              SMS Code: <Text style={styles.boldText}>{details.smsCode}</Text>
-            </Text>
+     <Modal visible={showModal} animationType="slide" transparent={true}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Product Details:</Text>
+            <View style={styles.modalDetails}>
+              <Text style={styles.modalText}>
+                Product Name: <Text style={styles.modalBoldText}>{details.ProductName}</Text>
+              </Text>
+              <Text style={styles.modalText}>
+                SMS Code: <Text style={styles.modalBoldText}>{details.SMSCode}</Text>
+              </Text>
+              <Text style={styles.modalText}>
+                Retail Price: <Text style={styles.modalBoldText}>{details.RetailPrice}</Text>
+              </Text>
+              <Text style={styles.modalText}>
+                Wholesale Price: <Text style={styles.modalBoldText}>{details.WholeSalePrice}</Text>
+              </Text>
             </View>
-            <View style={styles.wrapper}>
-            <Text style={styles.cardText}>
-              Retail Price: <Text style={styles.boldText}>{details.retailPrice}</Text>
-            </Text>
-            </View>
-            <View style={styles.wrapper}>
-            <Text style={styles.cardText}>
-              Wholesale Price: <Text style={styles.boldText}>{details.wholesalePrice}</Text>
-            </Text>
-            </View>
+            <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
+              <Text style={styles.modalButtonText}>Close</Text>
+            </TouchableOpacity>
           </View>
         </View>
-      )}
+      </Modal>
       <View style={styles.bottomView}>
       <Animated.View style={[styles.backButton, { transform: [{ scale: buttonScale }] }]}>
           <TouchableOpacity
@@ -136,7 +138,7 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: 'black',
     left: 50,
-    top:-225,
+    bottom:100
   },
   camera: {
     flex: 1,
@@ -234,6 +236,50 @@ const styles = StyleSheet.create({
   //   borderRadius: 10,   
   //   borderDashPattern: [0, 50],
   // },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 15,
+    padding: 20,
+    margin: 20,
+    width: '80%',
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalDetails: {
+    marginTop: 10,
+  },
+  modalText: {
+    fontSize: 14,
+    marginBottom: 5,
+  },
+  modalBoldText: {
+    fontWeight: 'bold',
+    color: '#DE006F',
+  },
+  modalButton: {
+    backgroundColor: '#B1B3B3',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 20,
+    marginTop: 20,
+  },
+  modalButtonText: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 14,
+    textAlign: 'center',
+  },
 });
 
 export default QRCodeScreen;
