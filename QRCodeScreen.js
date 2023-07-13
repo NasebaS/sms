@@ -6,6 +6,7 @@ import { RNCamera } from 'react-native-camera';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
+
 const QRCodeScreen = () => {
   const [scanning, setScanning] = useState(false);
   const [details, setDetails] = useState({});
@@ -35,12 +36,7 @@ const QRCodeScreen = () => {
       const data = await response.json();
       if (data && data.Details && data.Details.length > 0) {
         const details = data.Details[0];
-        if (
-          details.ProductName &&
-          details.SMSCode &&
-          details.RetailPrice &&
-          details.WholeSalePrice
-        ) {
+        if (details) {
           setDetails(details);
           setShowModal(true);
         } else {
