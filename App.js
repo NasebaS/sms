@@ -4,7 +4,7 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import QRCodeScreen from './QRCodeScreen';
 import Scan from './Scan'
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
+
 import { Modal, View, TextInput, Button } from 'react-native';
 import { HeaderButtons, HeaderButton, Item } from 'react-navigation-header-buttons';
 
@@ -14,22 +14,17 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const [showModal, setShowModal] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
-  const handleSettingsPress = () => {
-    setShowModal(true);
-  };
-  const handleSaveIpAddress = () => {
-        setShowModal(false);
-  };
-  const CustomHeaderButton = (props) => {
-    return (
-      <HeaderButton
-        {...props}
-        IconComponent={FontAwesome}
-        iconSize={24}
-        color="white"
-      />
-    );
-  };
+  // const handleSettingsPress = () => {
+  //   setShowModal(true);
+  // };
+  // const handleSaveIpAddress = () => {
+  //       setShowModal(false);
+  // };
+  // const CustomHeaderButton = (props) => {
+  //   return (
+      
+  //   );
+  // };
   
   return (
     <NavigationContainer>
@@ -38,23 +33,16 @@ const App = () => {
         headerMode: 'screen',
         headerTintColor: 'white',
         headerStyle: { backgroundColor: '#DE006F' },
-        headerRight: () => (
-          <HeaderButtons HeaderButtonComponent={CustomHeaderButton}>
-            <Item
-              title="Settings"
-              iconName="gear"
-              onPress={() => {
-                handleSettingsPress
-              }}
-            />
-          </HeaderButtons>
-        ),
+        
+         
+         
+       
       
       }}>
         <Stack.Screen name="Scan" component={Scan} />
         <Stack.Screen name="QRCodeScreen" component={QRCodeScreen} />
       </Stack.Navigator>
-      <Modal visible={showModal} animationType="slide" transparent>
+      {/* <Modal visible={showModal} animationType="slide" transparent>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ backgroundColor: 'white', padding: 20 }}>
             <TextInput
@@ -66,7 +54,7 @@ const App = () => {
             <Button title="Save" onPress={handleSaveIpAddress} />
           </View>
         </View>
-      </Modal>
+      </Modal> */}
     </NavigationContainer>
   );
 };
