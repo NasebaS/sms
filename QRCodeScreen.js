@@ -22,7 +22,7 @@ const QRCodeScreen = () => {
     setScanning(true);
   };
 
-  const handleBarCodeRead =async (event) => {
+  const handleBarCodeRead = async (event) => {
     if (!scanning) {
       return;
     }
@@ -34,24 +34,34 @@ const QRCodeScreen = () => {
       );
       const data = await response.json();
       if (data && data.Details && data.Details.length > 0) {
-        setDetails(data.Details[0]);
+        const details = data.Details[0];
+        if (
+          details.ProductName &&
+          details.SMSCode &&
+          details.RetailPrice &&
+          details.WholeSalePrice
+        ) {
+          setDetails(details);
+          setShowModal(true);
+        } else {
+          setDetails(null);
+          Alert.alert('No details found for the scanned QR code');
+          setScanning(true);
+        }
       } else {
-        setDetails(null); 
+        setDetails(null);
+        Alert.alert('No details found for the scanned QR code');
+        setScanning(true);
       }
-      // console.log(data.Details[0]);
-      // console.log(details.ProductName)
-      // console.log(details.SMSCode)
-      // console.log(details.RetailPrice)
-      // console.log(details.WholeSalePrice)
-    
     } catch (error) {
       console.error('Error fetching details:', error);
-      setDetails(null); 
+      setDetails(null);
+      Alert.alert('Error fetching details');
+      setScanning(true);
     }
-
-    setShowModal(true);
-    
   };
+  
+  
   const goBack = () => {
     navigation.navigate('Scan');
   };
@@ -73,7 +83,7 @@ const QRCodeScreen = () => {
   };
   const closeModal = () => {
     setShowModal(false);
-    setScanning(true); // Start scanning again after closing the modal
+    setScanning(true);
   };
   
   return (
@@ -100,10 +110,10 @@ const QRCodeScreen = () => {
                 SMS Code: <Text style={styles.modalBoldText}>{details.SMSCode}</Text>
               </Text>
               <Text style={styles.modalText}>
-                Retail Price: <Text style={styles.modalBoldText}>{details.RetailPrice}</Text>
+                Retail Price: <Text style={styles.modalBoldText}><Text style={styles.priceBold}>{details.RetailPrice}</Text></Text>
               </Text>
               <Text style={styles.modalText}>
-                Wholesale Price: <Text style={styles.modalBoldText}>{details.WholeSalePrice}</Text>
+                Wholesale Price: <Text style={styles.modalBoldText}><Text style={styles.priceBold}>{details.WholeSalePrice}</Text></Text>
               </Text>
             </View>
             <TouchableOpacity style={styles.modalButton} onPress={closeModal}>
@@ -162,11 +172,11 @@ const styles = StyleSheet.create({
     top: 15,
     backgroundColor: 'white',
     width: 325,
-    elevation: 15, // Add elevation for Android shadow
-    shadowColor: 'rgba(0, 0, 0, 0.5)', // Add shadow color for iOS shadow
-    shadowOffset: { width: 0, height: 5 }, // Add shadow offset for iOS shadow
-    shadowOpacity: 0.8, // Add shadow opacity for iOS shadow
-    shadowRadius: 2, // Add shadow radius for iOS shadow
+    elevation: 15, 
+    shadowColor: 'rgba(0, 0, 0, 0.5)',
+    shadowOffset: { width: 0, height: 5 }, 
+    shadowOpacity: 0.8, 
+    shadowRadius: 2, 
   },
   cardTitle: {
     fontSize: 14,
@@ -280,6 +290,11 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
   },
+  priceBold:{
+    fontSize:15,
+    
+    
+  }
 });
 
 export default QRCodeScreen;
