@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Image, TouchableOpacity, TextInput, Button, Text, StyleSheet, Animated } from 'react-native';
+import { View, Image, TouchableOpacity, TextInput, Button, Text, StyleSheet, Animated, Modal, TouchableWithoutFeedback } from 'react-native';
 import Scan from './Scan';
 import QRCodeScreen from './QRCodeScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,38 +10,44 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
+  const [isFirstTime, setIsFirstTime] = useState(true);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   const handleImageClick = () => {
     setShowMenu(!showMenu);
-    
   };
- 
 
-  const handleSaveIpAddress = async  () => {
+  const handleSaveIpAddress = async () => {
     // Save IP address to local storage
     try {
       await AsyncStorage.setItem('ipAddress', ipAddress);
-      await retrieveIpAddress();
+      setIsFirstTime(false);
       setShowMenu(false);
     } catch (error) {
       console.error('Error saving IP address:', error);
     }
   };
-  
+
   const retrieveIpAddress = async () => {
     // Retrieve IP address from local storage
     try {
       const savedIpAddress = await AsyncStorage.getItem('ipAddress');
       if (savedIpAddress !== null) {
         setIpAddress(savedIpAddress);
-        console.log('Ip Address saved',savedIpAddress)
+        setIsFirstTime(false);
+        console.log('Ip Address saved', savedIpAddress);
+      } else {
+        setIsFirstTime(true);
+        setShowMenu(true);
       }
     } catch (error) {
       console.error('Error retrieving IP address:', error);
     }
-    };  
-   
+  };
+
+  useEffect(() => {
+    retrieveIpAddress();
+  }, []);
 
   useEffect(() => {
     if (showMenu) {
@@ -75,21 +81,42 @@ const App = () => {
           options={{
             headerRight: () => (
               <TouchableOpacity onPress={handleImageClick} style={styles.dotContainer}>
-              <View style={styles.dot} />
-              <View style={styles.dot} />
-              <View style={styles.dot} />
-            </TouchableOpacity>
+                <View style={styles.dot} />
+                <View style={styles.dot} />
+                <View style={styles.dot} />
+              </TouchableOpacity>
             ),
           }}
         />
         <Stack.Screen name="QRCodeScreen">
-          {(props) => (
-            <QRCodeScreen {...props} ipAddress={ipAddress} />
-          )}
+          {(props) => <QRCodeScreen {...props} ipAddress={ipAddress} />}
         </Stack.Screen>
       </Stack.Navigator>
 
-     
+      {isFirstTime && (
+        <Modal visible={showMenu} animationType="fade" transparent={true}>
+          <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContent}>
+                <View style={styles.inputContainer}>
+                  <TextInput
+                    placeholder="Enter IP Address"
+                    value={ipAddress}
+                    onChangeText={setIpAddress}
+                    style={styles.input}
+                    placeholderTextColor="#9F9F9F"
+                  />
+                </View>
+                <Text style={styles.example}>Example: 192.168.29.38/sms</Text>
+                <TouchableOpacity onPress={handleSaveIpAddress} style={styles.saveButton}>
+                  <Text style={styles.buttonText}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
+        </Modal>
+      )}
+
       <Animated.View style={[styles.menuContainer, { opacity: fadeAnim }]}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -100,6 +127,7 @@ const App = () => {
             placeholderTextColor="#9F9F9F"
           />
         </View>
+        <Text style={styles.example}>Example: 192.168.29.38/sms</Text>
         <TouchableOpacity onPress={handleSaveIpAddress} style={styles.saveButton}>
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
@@ -113,7 +141,6 @@ const styles = StyleSheet.create({
     width: 20,
     height: 20,
     marginRight: 10,
-    
   },
   menuContainer: {
     position: 'absolute',
@@ -122,8 +149,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 8,
-    elevation: 5,
-    width: 200,
+    elevation: 10,
+    width: 220,
     opacity: 0,
   },
   inputContainer: {
@@ -133,10 +160,11 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   input: {
-    padding: 8,
+    padding: 5,
     color: '#000000',
     fontSize: 12,
     fontFamily: 'Arial',
+    marginBottom: -2,
   },
   saveButton: {
     backgroundColor: '#DE006F',
@@ -154,7 +182,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    width:35,
+    width: 35,
   },
   dot: {
     width: 3,
@@ -162,7 +190,26 @@ const styles = StyleSheet.create({
     borderRadius: 3,
     backgroundColor: 'white',
     marginVertical: 2,
-    right:-1,
+    right: -1,
+  },
+  example: {
+    color: 'blue',
+    fontSize: 10,
+    marginBottom: -2,
+    bottom: 10,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 8,
+    elevation: 10,
+    width: 220,
   },
 });
 
