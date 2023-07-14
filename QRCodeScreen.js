@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity,Animated,Modal , TouchableHighlight, Alert } from 'react-native';
-import { RNCamera } from 'react-native-camera';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 

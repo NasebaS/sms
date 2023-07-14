@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 // import SplashScreen from 'react-native-splash-screen';
 import img from './android/app/src/main/res/drawable/launch_screen.png';
-import QRCodeScreen from './QRCodeScreen';
+
 import { useNavigation } from '@react-navigation/native';
 
 
