@@ -6,7 +6,7 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
 
-const QRCodeScreen = () => {
+const QRCodeScreen = ({ ipAddress }) => {
   const [scanning, setScanning] = useState(false);
   const [details, setDetails] = useState({});
   const navigation = useNavigation();
@@ -30,7 +30,7 @@ const QRCodeScreen = () => {
     const scannedData = event.data;
     try {
       const response = await fetch(
-        `http://192.168.29.38/sms/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`
+        `http://${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`
       );
       const data = await response.json();
       if (data && data.Details && data.Details.length > 0) {

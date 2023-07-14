@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Image, TouchableOpacity, TextInput, Button, Text, StyleSheet, Animated } from 'react-native';
 import Scan from './Scan';
 import QRCodeScreen from './QRCodeScreen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -16,16 +16,32 @@ const App = () => {
     setShowMenu(!showMenu);
     
   };
+ 
 
   const handleSaveIpAddress = async  () => {
-    // Handle saving IP address here
+    // Save IP address to local storage
     try {
       await AsyncStorage.setItem('ipAddress', ipAddress);
+      await retrieveIpAddress();
       setShowMenu(false);
     } catch (error) {
       console.error('Error saving IP address:', error);
     }
   };
+  
+  const retrieveIpAddress = async () => {
+    // Retrieve IP address from local storage
+    try {
+      const savedIpAddress = await AsyncStorage.getItem('ipAddress');
+      if (savedIpAddress !== null) {
+        setIpAddress(savedIpAddress);
+        console.log('Ip Address saved',savedIpAddress)
+      }
+    } catch (error) {
+      console.error('Error retrieving IP address:', error);
+    }
+    };  
+   
 
   useEffect(() => {
     if (showMenu) {
@@ -66,9 +82,14 @@ const App = () => {
             ),
           }}
         />
-        <Stack.Screen name="QRCodeScreen" component={QRCodeScreen} />
+        <Stack.Screen name="QRCodeScreen">
+          {(props) => (
+            <QRCodeScreen {...props} ipAddress={ipAddress} />
+          )}
+        </Stack.Screen>
       </Stack.Navigator>
 
+     
       <Animated.View style={[styles.menuContainer, { opacity: fadeAnim }]}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -102,7 +123,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 8,
     elevation: 5,
-    width: 250,
+    width: 200,
     opacity: 0,
   },
   inputContainer: {
@@ -119,7 +140,7 @@ const styles = StyleSheet.create({
   },
   saveButton: {
     backgroundColor: '#DE006F',
-    borderRadius: 4,
+    borderRadius: 8,
     paddingVertical: 6,
     paddingHorizontal: 12,
     alignItems: 'center',
