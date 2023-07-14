@@ -145,26 +145,30 @@ const styles = StyleSheet.create({
   menuContainer: {
     position: 'absolute',
     top: 60,
-    right: 10,
+    right: 30,
     backgroundColor: '#FFFFFF',
     borderRadius: 8,
     padding: 8,
     elevation: 10,
-    width: 220,
+    width: 300,
     opacity: 0,
+    
   },
   inputContainer: {
     marginBottom: 8,
     borderWidth: 1,
     borderColor: '#9F9F9F',
     borderRadius: 4,
+
   },
   input: {
     padding: 5,
     color: '#000000',
-    fontSize: 12,
+    fontSize: 18,
     fontFamily: 'Arial',
     marginBottom: -2,
+    
+   
   },
   saveButton: {
     backgroundColor: '#DE006F',

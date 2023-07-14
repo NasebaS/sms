@@ -1,19 +1,17 @@
-
-
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity,Animated,Modal , TouchableHighlight, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Modal, Dimensions, Alert } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
+const { width, height } = Dimensions.get('window');
 
-const QRCodeScreen = ({ipAddress}) => {
+const QRCodeScreen = ({ ipAddress }) => {
   const [scanning, setScanning] = useState(false);
   const [details, setDetails] = useState({});
   const navigation = useNavigation();
   const [buttonScale] = useState(new Animated.Value(1));
   const [showModal, setShowModal] = useState(false);
 
- 
   useEffect(() => {
     startScanning();
   }, []);
@@ -29,9 +27,7 @@ const QRCodeScreen = ({ipAddress}) => {
     setScanning(false);
     const scannedData = event.data;
     try {
-      const response = await fetch(
-        `http:${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`
-      );
+      const response = await fetch(`http:${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`);
       const data = await response.json();
       if (data) {
         const details = data.Details[0];
@@ -55,11 +51,11 @@ const QRCodeScreen = ({ipAddress}) => {
       setScanning(true);
     }
   };
-  
-  
+
   const goBack = () => {
     navigation.navigate('Scan');
   };
+
   const handleButtonPress = () => {
     Animated.sequence([
       Animated.timing(buttonScale, {
@@ -76,11 +72,12 @@ const QRCodeScreen = ({ipAddress}) => {
       goBack();
     });
   };
+
   const closeModal = () => {
     setShowModal(false);
     setScanning(true);
   };
-  
+
   return (
     <View style={styles.container}>
       <QRCodeScanner
@@ -91,9 +88,8 @@ const QRCodeScreen = ({ipAddress}) => {
         cameraContainerStyle={styles.cameraContainer}
         cameraStyle={styles.camera}
         vibrate={false}
-        
       />
-     <Modal visible={showModal} animationType="slide" transparent={true}>
+      <Modal visible={showModal} animationType="slide" transparent={true}>
         <View style={styles.modalContainer}>
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Product Details:</Text>
@@ -118,11 +114,8 @@ const QRCodeScreen = ({ipAddress}) => {
         </View>
       </Modal>
       <View style={styles.bottomView}>
-      <Animated.View style={[styles.backButton, { transform: [{ scale: buttonScale }] }]}>
-          <TouchableOpacity
-            onPress={handleButtonPress}
-            activeOpacity={0.7}
-          >
+        <Animated.View style={[styles.backButton, { transform: [{ scale: buttonScale }] }]}>
+          <TouchableOpacity onPress={handleButtonPress} activeOpacity={0.7}>
             <Text style={styles.backButtonText}>Go Back</Text>
           </TouchableOpacity>
         </Animated.View>
@@ -130,117 +123,49 @@ const QRCodeScreen = ({ipAddress}) => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor:'#E3E3E3',
+    backgroundColor: '#E3E3E3',
   },
   cameraContainer: {
     flex: 1,
     width: '100%',
     backgroundColor: 'black',
-    left: 50,
-    bottom:100
+    left: width * 0.1,
+    bottom: height * 0.2,
   },
   camera: {
     flex: 1,
     width: '100%',
   },
-  detailsContainer: {
-    position: 'absolute',
-    top: 330,
-    left: 0,
-    right: 0,
-    paddingTop: 90,
-    paddingHorizontal: 20,
-        // backgroundColor: 'white',
-  },
-  card: {
-    borderWidth: 1,
-    borderColor: '#DDD',
-    borderRadius: 15,
-    padding: 40,
-    marginBottom: 5,
-    top: 15,
-    backgroundColor: 'white',
-    width: 325,
-    elevation: 15, 
-    shadowColor: 'rgba(0, 0, 0, 0.5)',
-    shadowOffset: { width: 0, height: 5 }, 
-    shadowOpacity: 0.8, 
-    shadowRadius: 2, 
-  },
-  cardTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    fontFamily: 'sans-serif',
-    position:'absolute',
-    top:70,
-    left:15,
-    color:'black'
-  },
-  cardText: {
-    fontSize: 14,
-    marginBottom: 2,
-    padding:0,
-    fontFamily: 'sans-serif',
-  },
-  divider: {
-    height: 1,
-    width: '100%',
-    backgroundColor: 'gray',
-  },
-  boldText: {
-    fontWeight: 'bold',
-    fontFamily: 'sans-serif',
-    color:'#DE006F',
-    fontSize:13,
-    padding:3,
-  },
   bottomView: {
-    // position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0,
-    padding: 20,
-    // backgroundColor: '#E3E3E3',
-    
+    padding: width * 0.05,
   },
   backButton: {
     backgroundColor: '#B1B3B3',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 20,
-    transform: [{ translateY: -10 }],
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.1,
+    borderRadius: height * 0.05,
+    marginTop: height * 0.04,
+    transform: [{ translateY: -height * 0.03 }],
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 2,
     elevation: 5,
+    top:width*-0.15,
   },
   backButtonText: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: width * 0.04,
   },
-  wrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    // marginBottom: 10,
-  },
-  // dashedMarker: {
-  //   borderWidth: 2,
-  //   borderColor: 'white',
-  //   borderStyle: 'dashed',
-  //   borderRadius: 10,   
-  //   borderDashPattern: [0, 50],
-  // },
   modalContainer: {
     flex: 1,
     justifyContent: 'center',
@@ -249,24 +174,24 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: 'white',
-    borderRadius: 15,
-    padding: 20,
-    margin: 20,
+    borderRadius: height * 0.03,
+    padding: width * 0.05,
+    margin: width * 0.05,
     width: '80%',
     elevation: 5,
   },
   modalTitle: {
-    fontSize: 18,
+    fontSize: width * 0.05,
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: width * 0.04,
     textAlign: 'center',
   },
   modalDetails: {
-    marginTop: 10,
+    marginTop: width * 0.04,
   },
   modalText: {
-    fontSize: 14,
-    marginBottom: 5,
+    fontSize: width * 0.04,
+    marginBottom: width * 0.02,
   },
   modalBoldText: {
     fontWeight: 'bold',
@@ -274,17 +199,18 @@ const styles = StyleSheet.create({
   },
   modalButton: {
     backgroundColor: '#B1B3B3',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
-    marginTop: 20,
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.1,
+    borderRadius: height * 0.05,
+    marginTop: height * 0.04,
   },
   modalButtonText: {
     color: 'black',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: width * 0.04,
     textAlign: 'center',
   },
+
   priceBold:{
     fontSize:15,
     

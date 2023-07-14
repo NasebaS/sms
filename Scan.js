@@ -1,66 +1,67 @@
-import React, { Component, useState,useEffect
- } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Alert,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
-  Image,Animated,Easing,
+  Image,
+  Animated,
+  Dimensions,
 } from 'react-native';
-// import SplashScreen from 'react-native-splash-screen';
 import img from './android/app/src/main/res/drawable/launch_screen.png';
-
 import { useNavigation } from '@react-navigation/native';
 
+const { width, height } = Dimensions.get('window');
+const imageWidth = width * 0.6; // Adjust the image width as desired
+const buttonWidth = width * 0.4; // Adjust the button width as desired
 
-const Scan =()=> {
+const Scan = () => {
   const navigation = useNavigation();
   const [scaleValue] = useState(new Animated.Value(1));
-   
-const handleScanNow = () => {
-  navigation.navigate('QRCodeScreen');
-};
-const startPulseAnimation = () => {
-  Animated.loop(
-    Animated.sequence([
-      Animated.timing(scaleValue, {
-        toValue: 1.2,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-      Animated.timing(scaleValue, {
-        toValue: 1,
-        duration: 1000,
-        useNativeDriver: true,
-      }),
-    ]),
-  ).start();
-};
 
+  const handleScanNow = () => {
+    navigation.navigate('QRCodeScreen');
+  };
 
-useEffect(() => {
-  startPulseAnimation();
-}, []);
+  const startPulseAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleValue, {
+          toValue: 1.2,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(scaleValue, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
 
+  useEffect(() => {
+    startPulseAnimation();
+  }, []);
 
   return (
     <View style={styles.container}>
-    
-      <Image source={img} style={styles.image} />
-      
+      <Image source={img} style={[styles.image, { width: imageWidth, height: imageWidth }]} />
       <Text style={styles.title}>SMS</Text>
       <TouchableOpacity
-        style={[styles.button, { transform: [{ scale: scaleValue }] }]}
+        style={[
+          styles.button,
+          { transform: [{ scale: scaleValue }], width: buttonWidth },
+        ]}
         onPress={handleScanNow}
       >
         <Text style={styles.buttonText}>Scan Now</Text>
       </TouchableOpacity>
     </View>
+  );
+};
 
-  ) 
-}
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -69,24 +70,24 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    fontSize: 24,
-    marginBottom: 20,
+    fontSize: width * 0.06,
+    marginBottom: height * 0.04,
   },
   button: {
     backgroundColor: '#2196F3',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 20,
+    paddingVertical: height * 0.02,
+    paddingHorizontal: width * 0.05,
+    borderRadius: height * 0.05,
+    alignItems:'center'
   },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
-    fontSize: 14,
+    fontSize: width * 0.04,
+    
   },
   image: {
-    width: 200,
-    height: 200,
-    marginBottom: 20,
+    marginBottom: height * 0.04,
   },
 });
 
