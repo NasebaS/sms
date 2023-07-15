@@ -65,6 +65,25 @@ const App = () => {
     }
   }, [fadeAnim, showMenu]);
 
+  const MaskedTextInput = ({ value, onChangeText }) => {
+    const [maskedValue, setMaskedValue] = useState('');
+
+    const handleTextChange = (text) => {
+      setMaskedValue(maskText(text));
+      onChangeText(text);
+    };
+  const maskText = (text) => {
+    const maskLength = text.length;
+    return '*'.repeat(maskLength) + text.slice(maskLength);
+  };
+
+  useEffect(() => {
+    setMaskedValue(maskText(value))
+  }, [value]);
+
+  return <Text style={styles.maskedText}>{maskedValue}</Text>;
+};
+
   return (
     <NavigationContainer>
       <Stack.Navigator
@@ -99,7 +118,7 @@ const App = () => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <View style={styles.inputContainer}>
-                  <TextInput
+                  <MaskedTextInput
                     placeholder="Enter IP Address"
                     value={ipAddress}
                     onChangeText={setIpAddress}
@@ -119,7 +138,7 @@ const App = () => {
 
       <Animated.View style={[styles.menuContainer, { opacity: fadeAnim }]}>
         <View style={styles.inputContainer}>
-          <TextInput
+          <MaskedTextInput
             placeholder="Enter IP Address"
             value={ipAddress}
             onChangeText={setIpAddress}
@@ -159,7 +178,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#9F9F9F',
     borderRadius: 4,
-
+    
   },
   input: {
     padding: 5,
@@ -167,8 +186,10 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontFamily: 'Arial',
     marginBottom: -2,
-    
-   
+      
+  },
+  maskedText: {
+    fontSize: 18, 
   },
   saveButton: {
     backgroundColor: '#DE006F',

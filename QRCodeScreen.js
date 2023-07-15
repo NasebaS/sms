@@ -94,8 +94,7 @@ const QRCodeScreen = ({ ipAddress }) => {
           <View style={styles.modalContent}>
             <Text style={styles.modalTitle}>Product Details:</Text>
             <View style={styles.modalDetails}>
-              <Text style={styles.modalText}>
-                Product Name: <Text style={styles.modalBoldText}>{details.ProductName}</Text>
+              <Text style={styles.modalText}>Product Name: <Text style={styles.modalBoldText}>{details.ProductName}</Text>
               </Text>
               <Text style={styles.modalText}>
                 SMS Code: <Text style={styles.modalBoldText}>{details.SMSCode}</Text>
