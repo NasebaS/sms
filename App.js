@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { View, Image, TouchableOpacity, TextInput, Button, Text, StyleSheet, Animated, Modal, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableOpacity, TextInput, Button, Text, StyleSheet, Animated} from 'react-native';
 import Scan from './Scan';
 import QRCodeScreen from './QRCodeScreen';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
-  const [isFirstTime, setIsFirstTime] = useState(true);
+  // const [isFirstTime, setIsFirstTime] = useState(true);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   const handleImageClick = () => {
@@ -21,7 +21,8 @@ const App = () => {
     // Save IP address to local storage
     try {
       await AsyncStorage.setItem('ipAddress', ipAddress);
-      setIsFirstTime(false);
+      console.log(ipAddress)
+      // setIsFirstTime(false);
       setShowMenu(false);
     } catch (error) {
       console.error('Error saving IP address:', error);
@@ -34,10 +35,10 @@ const App = () => {
       const savedIpAddress = await AsyncStorage.getItem('ipAddress');
       if (savedIpAddress !== null) {
         setIpAddress(savedIpAddress);
-        setIsFirstTime(false);
+        // setIsFirstTime(false);
         console.log('Ip Address saved', savedIpAddress);
       } else {
-        setIsFirstTime(true);
+        // setIsFirstTime(true);
         setShowMenu(true);
       }
     } catch (error) {
@@ -65,24 +66,7 @@ const App = () => {
     }
   }, [fadeAnim, showMenu]);
 
-  const MaskedTextInput = ({ value, onChangeText }) => {
-    const [maskedValue, setMaskedValue] = useState('');
-
-    const handleTextChange = (text) => {
-      setMaskedValue(maskText(text));
-      onChangeText(text);
-    };
-  const maskText = (text) => {
-    const maskLength = text.length;
-    return '*'.repeat(maskLength) + text.slice(maskLength);
-  };
-
-  useEffect(() => {
-    setMaskedValue(maskText(value))
-  }, [value]);
-
-  return <Text style={styles.maskedText}>{maskedValue}</Text>;
-};
+  
 
   return (
     <NavigationContainer>
@@ -112,18 +96,19 @@ const App = () => {
         </Stack.Screen>
       </Stack.Navigator>
 
-      {isFirstTime && (
+      {/* {isFirstTime && (
         <Modal visible={showMenu} animationType="fade" transparent={true}>
           <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
             <View style={styles.modalContainer}>
               <View style={styles.modalContent}>
                 <View style={styles.inputContainer}>
-                  <MaskedTextInput
+                  <TextInput
                     placeholder="Enter IP Address"
                     value={ipAddress}
                     onChangeText={setIpAddress}
                     style={styles.input}
                     placeholderTextColor="#9F9F9F"
+                    secureTextEntry={true}
                   />
                 </View>
                 <Text style={styles.example}>Example: 192.168.29.38/sms</Text>
@@ -134,16 +119,17 @@ const App = () => {
             </View>
           </TouchableWithoutFeedback>
         </Modal>
-      )}
+      )} */}
 
       <Animated.View style={[styles.menuContainer, { opacity: fadeAnim }]}>
         <View style={styles.inputContainer}>
-          <MaskedTextInput
+          <TextInput
             placeholder="Enter IP Address"
             value={ipAddress}
             onChangeText={setIpAddress}
             style={styles.input}
             placeholderTextColor="#9F9F9F"
+            secureTextEntry={true}
           />
         </View>
         <Text style={styles.example}>Example: 192.168.29.38/sms</Text>
@@ -188,9 +174,7 @@ const styles = StyleSheet.create({
     marginBottom: -2,
       
   },
-  maskedText: {
-    fontSize: 18, 
-  },
+ 
   saveButton: {
     backgroundColor: '#DE006F',
     borderRadius: 8,

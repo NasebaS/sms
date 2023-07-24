@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Animated, Modal, Dimensions, Alert } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Animated, Modal, Dimensions, Alert,useColorScheme} from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { useNavigation } from '@react-navigation/native';
 
@@ -11,6 +11,7 @@ const QRCodeScreen = ({ ipAddress }) => {
   const navigation = useNavigation();
   const [buttonScale] = useState(new Animated.Value(1));
   const [showModal, setShowModal] = useState(false);
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     startScanning();
@@ -26,8 +27,10 @@ const QRCodeScreen = ({ ipAddress }) => {
     }
     setScanning(false);
     const scannedData = event.data;
+    console.log(`http://${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`)
     try {
-      const response = await fetch(`http:${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`);
+      const response = await fetch(`http://${ipAddress}/WebServices/WebService.asmx/getProductbyCode?Code=${scannedData}`);
+      
       const data = await response.json();
       if (data) {
         const details = data.Details[0];
@@ -79,7 +82,7 @@ const QRCodeScreen = ({ ipAddress }) => {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, colorScheme === 'dark' && styles.darkContainer]}>
       <QRCodeScanner
         reactivate={true}
         showMarker={true}
@@ -90,8 +93,8 @@ const QRCodeScreen = ({ ipAddress }) => {
         vibrate={false}
       />
       <Modal visible={showModal} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
+        <View style={[styles.modalContainer, colorScheme === 'dark' && styles.darkModalContainer]}>
+          <View style={[styles.modalContent, colorScheme === 'dark' && styles.darkModalContent]}>
             <Text style={styles.modalTitle}>Product Details:</Text>
             <View style={styles.modalDetails}>
               <Text style={styles.modalText}>Product Name: <Text style={styles.modalBoldText}>{details.ProductName}</Text>
@@ -113,9 +116,13 @@ const QRCodeScreen = ({ ipAddress }) => {
         </View>
       </Modal>
       <View style={styles.bottomView}>
-        <Animated.View style={[styles.backButton, { transform: [{ scale: buttonScale }] }]}>
+        <Animated.View style={[
+            styles.backButton,
+            { transform: [{ scale: buttonScale }] },
+            colorScheme === 'dark' && styles.darkBackButton,
+          ]}>
           <TouchableOpacity onPress={handleButtonPress} activeOpacity={0.7}>
-            <Text style={styles.backButtonText}>Go Back</Text>
+          <Text style={[styles.backButtonText, colorScheme === 'dark' && styles.darkBackButtonText]}>Go Back</Text>
           </TouchableOpacity>
         </Animated.View>
       </View>
@@ -129,11 +136,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#E3E3E3',
   },
+  darkContainer: {
+    backgroundColor: '#080202',
+  },
+  darkModalContainer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  darkModalContent: {
+    backgroundColor: 'black',
+    borderRadius: height * 0.03,
+    padding: width * 0.05,
+    margin: width * 0.05,
+    width: '80%',
+    elevation: 5,
+  },
+  darkBackButton: {
+    backgroundColor: '#B1B3B3',
+  },
+  darkBackButtonText: {
+    color: 'black',
+  },
   cameraContainer: {
     flex: 1,
     width: '100%',
     backgroundColor: 'black',
-    left: width * 0.1,
+    left: width * 0.15,
     bottom: height * 0.2,
   },
   camera: {
