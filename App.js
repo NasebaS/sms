@@ -10,7 +10,7 @@ const Stack = createNativeStackNavigator();
 const App = () => {
   const [showMenu, setShowMenu] = useState(false);
   const [ipAddress, setIpAddress] = useState('');
-  // const [isFirstTime, setIsFirstTime] = useState(true);
+  const [isFirstTime, setIsFirstTime] = useState(true);
   const fadeAnim = useState(new Animated.Value(0))[0];
 
   const handleImageClick = () => {
@@ -22,7 +22,7 @@ const App = () => {
     try {
       await AsyncStorage.setItem('ipAddress', ipAddress);
       console.log(ipAddress)
-      // setIsFirstTime(false);
+      setIsFirstTime(false);
       setShowMenu(false);
     } catch (error) {
       console.error('Error saving IP address:', error);
@@ -35,10 +35,10 @@ const App = () => {
       const savedIpAddress = await AsyncStorage.getItem('ipAddress');
       if (savedIpAddress !== null) {
         setIpAddress(savedIpAddress);
-        // setIsFirstTime(false);
+        setIsFirstTime(false);
         console.log('Ip Address saved', savedIpAddress);
       } else {
-        // setIsFirstTime(true);
+        setIsFirstTime(true);
         setShowMenu(true);
       }
     } catch (error) {
@@ -66,7 +66,13 @@ const App = () => {
     }
   }, [fadeAnim, showMenu]);
 
-  
+  const handleOpenModal = () => {
+    if (isFirstTime) {
+      setShowMenu(true);
+    } else {
+      setIpAddress('');
+    }
+  };
 
   return (
     <NavigationContainer>
@@ -96,31 +102,8 @@ const App = () => {
         </Stack.Screen>
       </Stack.Navigator>
 
-      {/* {isFirstTime && (
-        <Modal visible={showMenu} animationType="fade" transparent={true}>
-          <TouchableWithoutFeedback onPress={() => setShowMenu(false)}>
-            <View style={styles.modalContainer}>
-              <View style={styles.modalContent}>
-                <View style={styles.inputContainer}>
-                  <TextInput
-                    placeholder="Enter IP Address"
-                    value={ipAddress}
-                    onChangeText={setIpAddress}
-                    style={styles.input}
-                    placeholderTextColor="#9F9F9F"
-                    secureTextEntry={true}
-                  />
-                </View>
-                <Text style={styles.example}>Example: 192.168.29.38/sms</Text>
-                <TouchableOpacity onPress={handleSaveIpAddress} style={styles.saveButton}>
-                  <Text style={styles.buttonText}>Save</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableWithoutFeedback>
-        </Modal>
-      )} */}
-
+      
+      {!isFirstTime && (
       <Animated.View style={[styles.menuContainer, { opacity: fadeAnim }]}>
         <View style={styles.inputContainer}>
           <TextInput
@@ -136,7 +119,7 @@ const App = () => {
         <TouchableOpacity onPress={handleSaveIpAddress} style={styles.saveButton}>
           <Text style={styles.buttonText}>Save</Text>
         </TouchableOpacity>
-      </Animated.View>
+      </Animated.View>)}
     </NavigationContainer>
   );
 };
